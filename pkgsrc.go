@@ -21,7 +21,7 @@ type Pkg struct {
 	vers       string
 	ext        string
 	PkgName    string
-	PkgNameExt string
+	pkgNameExt string
 	url        string
 	hashType   string
 	hash       string
@@ -36,7 +36,7 @@ func (p *Pkg) Init(name, vers, ext, url, hashType, hash string) {
 	p.hashType = hashType
 	p.hash = hash
 	p.PkgName = name + "-" + vers
-	p.PkgNameExt = p.PkgName + "." + ext
+	p.pkgNameExt = p.PkgName + "." + ext
 }
 
 // CleanWorkdir function for remove existing workdir
@@ -56,7 +56,7 @@ func (p *Pkg) CleanWorkdir() {
 // CheckSum function for checking hash
 // TODO Other than sha256 algorithm
 func (p *Pkg) CheckSum() bool {
-	wdPkgNameExt := path.Join(Workdir, p.PkgNameExt)
+	wdPkgNameExt := path.Join(Workdir, p.pkgNameExt)
 
 	f, err := os.Open(wdPkgNameExt)
 	if err != nil {
@@ -78,7 +78,7 @@ func (p *Pkg) CheckSum() bool {
 
 // DownloadPkg function for getting package source
 func (p *Pkg) DownloadPkg() {
-	wdPkgNameExt := path.Join(Workdir, p.PkgNameExt)
+	wdPkgNameExt := path.Join(Workdir, p.pkgNameExt)
 	out, err := os.Create(wdPkgNameExt)
 	if err != nil {
 		log.Fatal(err)
@@ -86,7 +86,7 @@ func (p *Pkg) DownloadPkg() {
 	defer out.Close()
 
 	// TODO Using join
-	resp, err := http.Get(p.url + "/" + p.PkgNameExt)
+	resp, err := http.Get(p.url + "/" + p.pkgNameExt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func (p *Pkg) Unpack() {
 	if err := os.Chdir(Workdir); err != nil {
 		log.Fatal(err)
 	}
-	wdPkgNameExt := path.Join(Workdir, p.PkgNameExt)
+	wdPkgNameExt := path.Join(Workdir, p.pkgNameExt)
 	cmd := exec.Command("/usr/bin/tar", "xzvf", wdPkgNameExt)
 	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
