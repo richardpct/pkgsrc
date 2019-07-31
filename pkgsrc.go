@@ -2,8 +2,10 @@
 package pkgsrc
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +16,9 @@ import (
 
 // Workdir directory for building packages source
 const Workdir = "/tmp/build"
+
+// Ncpu is the number of CPU Core
+var Ncpu string
 
 // Pkg definition
 type Pkg struct {
@@ -37,6 +42,13 @@ func (p *Pkg) Init(name, vers, ext, url, hashType, hash string) {
 	p.hash = hash
 	p.PkgName = name + "-" + vers
 	p.pkgNameExt = p.PkgName + "." + ext
+
+	cmd := exec.Command("/usr/sbin/sysctl", "-n", "hw.ncpu")
+	if out, err := cmd.Output(); err != nil {
+		log.Fatal(err)
+	} else {
+		Ncpu = fmt.Sprintf("%s", bytes.TrimRight(out, "\n"))
+	}
 }
 
 // CleanWorkdir function for remove existing workdir
